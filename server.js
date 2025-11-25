@@ -3,36 +3,30 @@ const axios = require("axios");
 const app = express();
 
 // --- CONFIGURATION ---
-// Replace these with the keys you got from Step 1
 const BIN_ID = "6925bcefd0ea881f40ff674e"; 
 const API_KEY = "$2a$10$sVMLR2Pslzjh4azLrjabseG.LR3H3Qko9FyycwVDTySgHrK0LS9v2"; 
 
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-// Endpoint: GET /message
-app.get("/message", (req, res) => {
-  res.send("Render Server Online!");
-});
-
-// Endpoint: GET /highscore
-app.get("/highscore", async (req, res) => {
+// Endpoint: GET /leaderboard
+// Returns a JSON list: [{"name":"Alex","score":500}, {"name":"Bob","score":400}]
+app.get("/leaderboard", async (req, res) => {
   try {
-    // Fetch data from JSONBin
     const response = await axios.get(JSONBIN_URL + "/latest", {
       headers: { "X-Master-Key": API_KEY }
     });
-    // Send just the score number back to the game
-    res.send(response.data.record.score.toString());
+    // Return the array, or empty array if missing
+    res.json(response.data.record.leaderboard || []);
   } catch (error) {
     console.error(error);
-    res.send("0");
+    res.json([]);
   }
 });
 
 // Endpoint: POST /submit?name=ABC&score=123
 app.post("/submit", async (req, res) => {
   const newScore = parseInt(req.query.score);
-  const newName = req.query.name;
+  const newName = req.query.name || "Unknown";
 
   try {
     // 1. Get current data
@@ -40,23 +34,27 @@ app.post("/submit", async (req, res) => {
       headers: { "X-Master-Key": API_KEY }
     });
     
-    const currentData = readResponse.data.record;
+    let data = readResponse.data.record;
+    if (!data.leaderboard) data.leaderboard = [];
 
-    // 2. Check if we beat the score
-    if (newScore > currentData.score) {
-      const newData = { score: newScore, holder: newName };
+    // 2. Add new score
+    data.leaderboard.push({ name: newName, score: newScore });
 
-      // 3. Save new data back to JSONBin
-      await axios.put(JSONBIN_URL, newData, {
-        headers: { 
-            "Content-Type": "application/json",
-            "X-Master-Key": API_KEY 
-        }
-      });
-      console.log(`New High Score: ${newScore} by ${newName}`);
-    }
+    // 3. Sort by score (Highest first)
+    data.leaderboard.sort((a, b) => b.score - a.score);
+
+    // 4. Keep only Top 5
+    data.leaderboard = data.leaderboard.slice(0, 5);
+
+    // 5. Save back to JSONBin
+    await axios.put(JSONBIN_URL, data, {
+      headers: { 
+          "Content-Type": "application/json",
+          "X-Master-Key": API_KEY 
+      }
+    });
     
-    res.send("OK");
+    res.send("Score Saved");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error");
@@ -66,5 +64,4 @@ app.post("/submit", async (req, res) => {
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-
 });
