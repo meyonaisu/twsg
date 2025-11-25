@@ -43,8 +43,8 @@ app.post("/submit", async (req, res) => {
     // 3. Sort by score (Highest first)
     data.leaderboard.sort((a, b) => b.score - a.score);
 
-    // 4. Keep only Top 5
-    data.leaderboard = data.leaderboard.slice(0, 5);
+    // 4. Keep only Top 50
+    data.leaderboard = data.leaderboard.slice(0, 50);
 
     // 5. Save back to JSONBin
     await axios.put(JSONBIN_URL, data, {
@@ -65,3 +65,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
