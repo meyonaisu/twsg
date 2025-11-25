@@ -9,7 +9,7 @@ const API_KEY = "$2a$10$sVMLR2Pslzjh4azLrjabseG.LR3H3Qko9FyycwVDTySgHrK0LS9v2";
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 let chatMemory = []; 
-let serverAnnouncement = "System: Welcome to Space Dodge! Good luck pilots.";
+let serverAnnouncement = "Ai đạt được 1000 điểm sẽ reset leaderboard và reset threshold sẽ tăng thêm 1000";
 
 // Helper: Get Leaderboard
 async function getLeaderboard() {
@@ -75,3 +75,4 @@ app.post("/submit", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => { console.log(`Server running on port ${port}`); });
+
