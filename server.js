@@ -4,8 +4,8 @@ const app = express();
 
 // --- CONFIGURATION ---
 // Replace these with the keys you got from Step 1
-const BIN_ID = "YOUR_BIN_ID_HERE"; 
-const API_KEY = "$2b$10$YOUR_MASTER_KEY_HERE"; 
+const BIN_ID = "6925bcefd0ea881f40ff674e"; 
+const API_KEY = "$2a$10$sVMLR2Pslzjh4azLrjabseG.LR3H3Qko9FyycwVDTySgHrK0LS9v2"; 
 
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
@@ -66,4 +66,5 @@ app.post("/submit", async (req, res) => {
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+
 });
