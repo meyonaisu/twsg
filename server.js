@@ -16,7 +16,7 @@ const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 const ADMIN_PASSWORD = "mypassword123"; 
 
 let chatMemory = []; 
-let serverAnnouncement = "26/11/2025 Update: Live chat added. (Shout out to JUNAR for testing the chat function)";
+let serverAnnouncement = "26/11/2025 Update: OpenGL renderer supported. Improved UX.";
 
 // ... [getLeaderboard and saveLeaderboard functions stay the same] ...
 
@@ -93,6 +93,7 @@ app.post("/submit", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => { console.log(`Server running on port ${port}`); });
+
 
 
 
