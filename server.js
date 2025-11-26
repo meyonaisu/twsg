@@ -16,7 +16,7 @@ const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 const ADMIN_PASSWORD = "mypassword123"; 
 
 let chatMemory = []; 
-let serverAnnouncement = "Ai đạt được 1000 điểm sẽ reset leaderboard và reset threshold sẽ tăng thêm 1000";
+let serverAnnouncement = "26/11/2025 Update: Live chat added.";
 
 // ... [getLeaderboard and saveLeaderboard functions stay the same] ...
 
@@ -93,3 +93,4 @@ app.post("/submit", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => { console.log(`Server running on port ${port}`); });
+
