@@ -3,8 +3,8 @@ const axios = require("axios");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-const app = express();
 
+const app = express();
 app.use(express.json());
 app.use(cors());
 
@@ -25,12 +25,14 @@ app.get("/data", async (req, res) => {
         const response = await axios.get(JSONBIN_URL + "/latest", { headers: { "X-Master-Key": API_KEY } });
         leaderboard = response.data.record.leaderboard || [];
     } catch (e) { console.error("JsonBin Error"); }
+
     res.json({ 
         leaderboard: leaderboard, 
         chat: chatMemory,
         announcement: serverAnnouncement
     });
 });
+
 // Submit Score (Single Player)
 app.post("/submit", async (req, res) => {
     const newScore = parseInt(req.body.score);
@@ -41,12 +43,14 @@ app.post("/submit", async (req, res) => {
         leaderboard.push({ name: newName, score: newScore });
         leaderboard.sort((a, b) => b.score - a.score);
         leaderboard = leaderboard.slice(0, 10);
+
         await axios.put(JSONBIN_URL, { leaderboard: leaderboard }, {
             headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY }
         });
         res.send("Score Saved");
     } catch (e) { res.status(500).send("Error"); }
 });
+
 // Simple Chat (Single Player Screen)
 app.post("/chat", (req, res) => {
     const name = req.body.name || "Anon";
@@ -57,18 +61,24 @@ app.post("/chat", (req, res) => {
     }
     res.send("Sent");
 });
+
 // --- REAL-TIME MULTIPLAYER (Socket.IO) ---
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
+
 let players = {}; // Format: { socketId: { x, y, name, r, g, b } }
+
 io.on("connection", (socket) => {
-    console.log`Player Connected: ${socket.id}`);
+    console.log(`Player Connected: ${socket.id}`);
+
     // Assign random color
     const r = Math.random();
     const g = Math.random();
     const b = Math.random();
+
     // Initialize player data
     players[socket.id] = { x: 0, y: 0, name: "Pilot", r, g, b };
+
     // Handle Movement Updates from Client
     socket.on("updatePlayer", (data) => {
         if (players[socket.id]) {
@@ -77,19 +87,21 @@ io.on("connection", (socket) => {
             players[socket.id].name = data.name;
         }
     });
+
     // Handle Disconnect
     socket.on("disconnect", () => {
-        console.log`Player Disconnected: ${socket.id}`);
+        console.log(`Player Disconnected: ${socket.id}`);
         delete players[socket.id];
     });
 });
+
 // Broadcast Loop: Send all player positions to everyone 30 times a second
 setInterval(() => {
     io.emit("serverState", players);
 }, 1000 / 30);
+
 // --- START SERVER ---
 const port = process.env.PORT || 3000;
 server.listen(port, () => { 
-    console.log`Server running on port ${port}`); 
+    console.log(`Server running on port ${port}`); 
 });
-
