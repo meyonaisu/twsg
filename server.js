@@ -1,26 +1,20 @@
 const express = require("express");
 const axios = require("axios");
-const cors = require("cors"); // Recommended: Run 'npm install cors'
+const cors = require("cors");
 const app = express();
 
-// --- MIDDLEWARE ---
-app.use(express.json()); // <--- CRITICAL: Allows server to read JSON body
-app.use(cors());         // <--- CRITICAL: Fixes browser connection blocks
+app.use(express.json());
+app.use(cors());
 
-// --- CONFIGURATION ---
 const BIN_ID = "6925bcefd0ea881f40ff674e"; 
 const API_KEY = "$2a$10$sVMLR2Pslzjh4azLrjabseG.LR3H3Qko9FyycwVDTySgHrK0LS9v2"; 
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-// Admin Password (was missing in your snippet, added placeholder)
 const ADMIN_PASSWORD = "mypassword123"; 
 
 let chatMemory = []; 
 let serverAnnouncement = "26/11/2025 Update: OpenGL renderer supported. Improved UX.";
 
-// ... [getLeaderboard and saveLeaderboard functions stay the same] ...
-
-// Helper: Get Leaderboard
 async function getLeaderboard() {
   try {
     const response = await axios.get(JSONBIN_URL + "/latest", { headers: { "X-Master-Key": API_KEY } });
@@ -34,7 +28,6 @@ async function saveLeaderboard(leaderboardData) {
   });
 }
 
-// Endpoint: GET /data
 app.get("/data", async (req, res) => {
   const leaderboard = await getLeaderboard();
   res.json({ 
@@ -44,9 +37,7 @@ app.get("/data", async (req, res) => {
   });
 });
 
-// Endpoint: POST /announce
 app.post("/announce", (req, res) => {
-  // Use req.body for POST requests, not req.query
   const msg = req.body.msg || req.query.msg; 
   const pass = req.body.pass || req.query.pass;
 
@@ -57,9 +48,7 @@ app.post("/announce", (req, res) => {
   res.send("Announcement Updated");
 });
 
-// Endpoint: POST /chat
 app.post("/chat", (req, res) => {
-  // FIXED: Changed to req.body to handle special characters and long text
   const name = req.body.name || "Anon";
   const msg = req.body.msg || "";
 
@@ -67,7 +56,6 @@ app.post("/chat", (req, res) => {
 
   chatMemory.push({ name: name, msg: msg });
 
-  // Logic: Keep only the NEWEST 20 messages
   if (chatMemory.length > 20) {
     chatMemory = chatMemory.slice(chatMemory.length - 20);
   }
@@ -75,9 +63,7 @@ app.post("/chat", (req, res) => {
   res.send("Sent");
 });
 
-// Endpoint: POST /submit
 app.post("/submit", async (req, res) => {
-  // FIXED: Changed to req.body
   const newScore = parseInt(req.body.score);
   const newName = req.body.name || "Unknown";
 
@@ -93,6 +79,7 @@ app.post("/submit", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => { console.log(`Server running on port ${port}`); });
+
 
 
 
