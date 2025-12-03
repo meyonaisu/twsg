@@ -86,9 +86,10 @@ io.on("connection", (socket) => {
 // Broadcast Loop: Send all player positions to everyone 30 times a second
 setInterval(() => {
     io.emit("serverState", players);
-}, 1000 / 60);
+}, 1000 / 30);
 // --- START SERVER ---
 const port = process.env.PORT || 3000;
 server.listen(port, () => { 
     console.log`Server running on port ${port}`); 
 });
+
